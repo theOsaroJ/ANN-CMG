@@ -17,14 +17,14 @@ data = pd.read_csv('co2_data.csv')
 X = data.iloc[:, :7].values  # First 7 columns as input features
 y = data.iloc[:, -3:].values  # Last 3 columns as target variables
 
-# Modify Target 3: Start from row 738 and exclude rows with 0 values
-y[:, 2] = np.where(data.index >= 738, y[:, 2], np.nan)  # Replace values before row 738 with NaN
+# Modify Target 3: Start from row 740 and exclude rows with 0 values
+y[:, 2] = np.where(data.index >= 740, y[:, 2], np.nan)  # Replace values before row 738 with NaN
 non_zero_indices = ~np.isnan(y[:, 2]) & (y[:, 2] != 0)  # Find rows where Target 3 is non-zero
 X = X[non_zero_indices]
 y = y[non_zero_indices]
 
 # Split the dataset into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Standardize the data
 scaler_X = StandardScaler()
@@ -81,14 +81,14 @@ for i in range(y.shape[1]):
                          project_name=f'co2_prediction_target_{i}')
 
     # Run the tuner
-    tuner.search(X_train, y_train_scaled, epochs=50, validation_split=0.2, batch_size=32)
+    tuner.search(X_train, y_train_scaled, epochs=200, validation_split=0.3, batch_size=32)
 
     # Retrieve the best hyperparameters and rebuild the model
     best_hyperparameters = tuner.get_best_hyperparameters()[0]
     best_model = build_model(best_hyperparameters)
 
     # Retrain the best model to capture the training history
-    history = best_model.fit(X_train, y_train_scaled, epochs=50, validation_split=0.2, batch_size=32, verbose=1)
+    history = best_model.fit(X_train, y_train_scaled, epochs=200, validation_split=0.3, batch_size=32, verbose=1)
 
     # Store the best model for later use
     models.append(best_model)
